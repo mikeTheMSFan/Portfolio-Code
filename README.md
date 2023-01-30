@@ -1,4 +1,4 @@
-# Mike's Portfolio Code
+# Mike's Portfolio Code
 
 I'm sharing this code to give people insight into my thought process when tackling a project. Feel free to use and alter it as you see fit.
 
