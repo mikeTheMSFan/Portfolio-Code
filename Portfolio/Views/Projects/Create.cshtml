@@ -1,0 +1,76 @@
+﻿@model ProjectCreateViewModel
+
+@{
+    ViewData["Title"] = "Mike Robinson's Site - Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    MultiSelectList projectMultiSelectList = default!;
+    if (ViewBag.ProjectMultiSelectList is not null)
+    {
+        projectMultiSelectList = (MultiSelectList)ViewBag.ProjectMultiSelectList;
+    }
+}
+
+<section id="createProject">
+    <div class="container">
+        <h1>Create Project</h1>
+        <hr class="m-0 my-2 text-start border-top border-info w-75"/>
+        <div id="formContainer" class="row">
+            <div id="projectCreateForm" class="col-md-8">
+                <form id="projectForm" asp-action="Create" asp-controller="Projects" class="" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label class="form-label">Project Categories</label>
+                        @Html.ListBoxFor(m => m.Project.Categories, projectMultiSelectList, new { @class = "form-control" })
+                        <span asp-validation-for="Project.Categories" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Project.Title" class="control-label"></label>
+                        <input asp-for="Project.Title" class="form-control"/>
+                        <span asp-validation-for="Project.Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Project.Description" class="control-label"></label>
+                        <textarea asp-for="Project.Description" class="form-control"></textarea>
+                        <span asp-validation-for="Project.Description" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Project Images (svg, jpeg, gif, and png files.)</label>
+                        <div id="myDropzone" class="dropzone" name="Project.ProjectImages"></div>
+                        <span asp-validation-for="Project.ProjectImages" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Project.ProjectUrl" class="control-label"></label>
+                        <input asp-for="Project.ProjectUrl" class="form-control"/>
+                        <span asp-validation-for="Project.ProjectUrl" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input id="confirm-btn" type="button" value="Create" class="btn btn-primary"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div>
+            <a asp-controller="Projects" asp-action="AllAuthorProjects">Your Projects</a>
+        </div>
+
+    </div>
+</section><!--/. createProject-section -->
+
+@section CustomCss {
+    <link rel="stylesheet" href="~/lib/cropperjs/cropper.min.css"/>
+    <link rel="stylesheet" href="~/css/Auth/jquery-ui.min.css"/>
+    <link rel="stylesheet" href="~/lib/dropzone/dropzone.min.css"/>
+    <link rel="stylesheet" href="~/lib/sweetalert2/dist/sweetalert2.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@sweetalert2/theme-bulma@5/bulma.css"/>
+}
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script src="~/lib/jquery-ui-1.13.1/jquery-ui.min.js"></script>
+    <script src="~/lib/cropperjs/cropper.min.js"></script>
+    <script src="~/lib/sweetalert2/dist/sweetalert2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.min.js"></script>
+    <script src="~/js/projects/customDropzone.js"></script>
+}

@@ -1,0 +1,134 @@
+@using Portfolio.Enums
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<BlogUser> UserManager
+@model PostCreateViewModel
+
+@{
+    ViewData["Title"] = "Mike Robinson's Site - Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var blogUserId = UserManager.GetUserId(User);
+
+    IEnumerable<SelectListItem> tagItems = new List<SelectListItem>();
+    if (Model.TagValues is not null)
+    {
+        tagItems = Model.TagValues.OrderBy(x => x).Select(x => new SelectListItem() { Text = x, Value = x });
+    }
+}
+
+@Html.Hidden("BlogUserId", blogUserId)
+
+@if (Model.Post?.CategoryId is not null)
+{
+    @Html.Hidden("CategoryId", Model.Post.CategoryId)
+}
+<!-- Begin Create Posts -->
+<section id="createPosts">
+    <div class="container">
+        <h1>Create Post</h1>
+        <div class="row">
+            <div class="col-md-8">
+                <form method="Post" asp-action="Create" asp-controller="Posts" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Post!.AuthorId" value="@UserManager.GetUserId(User)" />
+                    <div class="form-group">
+                        <label asp-for="Post!.BlogId" class="control-label"></label>
+                        <select asp-for="Post!.BlogId" class="form-control" asp-items="@Model.BlogSelectList"></select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Post!.Title" class="control-label"></label>
+                        <br />
+                        <span asp-validation-for="Post!.Title" class="text-danger"></span>
+                        <input asp-for="Post!.Title" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Post!.CategoryId"></label>
+                        <select class="form-control" asp-for="Post!.CategoryId" asp-items="@Model.CategorySelectList">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Post!.Abstract" class="control-label"></label>
+                        <textarea asp-for="Post!.Abstract" class="form-control"></textarea>
+                        <span asp-validation-for="Post!.Abstract" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Post!.Content" class="control-label"></label>
+                        <textarea asp-for="Post!.Content" class="form-control"></textarea>
+                        <span asp-validation-for="Post!.Content" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Post!.ReadyStatus" class="control-label"></label>
+                        <select asp-for="Post!.ReadyStatus" asp-items="@Html.GetEnumSelectList<ReadyStatus>()" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <div id="image-box" class="image-container"></div>
+                        <div class="my-4">
+                            <div id="slider" class="ep-slider-bar w-100 h-auto"></div>
+                        </div>
+                        <button class="btn btn-outline-info" id="crop-btn" style="width: 100%; margin-top: 10px; display: none;" type="button">Crop</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Image (svg, jpeg, gif, and png files.)</label>
+                        <input type="file" asp-for="ImageFile" class="form-control"/>
+                        <span asp-validation-for="ImageFile" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col">
+                                <label class="control-label">Manage Tags</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col">
+                                        <input type="text" class="form-control" id="TagEntry"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col w-100">
+                                        <button type="button" class="btn btn-primary btn-sm w-100" name="Add">Add</button>
+                                    </div>
+                                    <div class="col">
+                                        <button type="button" class="btn btn-primary btn-sm w-100" name="delete">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <select class="w-100" asp-for="TagValues" asp-items="@tagItems" id="TagList" multiple></select>
+                            </div>
+                        </div>
+                        <span asp-validation-for="TagValues" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input id="confirm-btn" type="submit" value="Create" class="btn btn-sm btn-primary"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div>
+            <a asp-controller="Posts" asp-action="AllAuthorPosts">Your Posts</a>
+        </div>
+    </div>
+</section><!--/. createPosts-section -->
+
+@section CustomCss
+{
+    <link rel="stylesheet" href="~/lib/cropperjs/cropper.min.css" />
+    <link rel="stylesheet" href="~/css/Auth/jquery-ui.min.css" />
+    <link rel="stylesheet" href="~/css/Auth/jquery-ui.theme.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0/dist/summernote-lite.min.css" />
+}
+
+@section Scripts
+{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/cropperjs/cropper.min.js"></script>
+    <script src="~/lib/jquery-ui-1.13.1/jquery-ui.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.min.js"></script>
+    <script src=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0/dist/summernote-lite.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="~/js/customPost.js"></script>
+    <script src="~/js/customCropper.js"></script>
+    <script src="~/js/summerNotePost.js"></script>
+}

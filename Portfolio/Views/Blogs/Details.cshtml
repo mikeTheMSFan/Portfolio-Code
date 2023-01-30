@@ -1,0 +1,192 @@
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model Portfolio.Models.ViewModels.BlogPostViewModel;
+@{
+    ViewData["Title"] = "Mike Robinson's Site - Blog Posts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@inject IMWSImageService ImageService;
+
+<!-- Heading page-->
+<div id="blogHeading" class="heading-page blog-overlay heading-page-cover">
+    <img src="@ImageService.DecodeImage(Model.Blog.Image!, Model.Blog.ImageType!)" alt="blog banner" />
+    <div>
+        <h3 class="hp-title">@Model.Blog.Name.ToUpper()</h3>
+        <breadcrumb></breadcrumb>
+    </div>
+</div>
+<!-- end heading page-->
+
+<main class="page-two-col bg-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9">
+                <section class="section-blog-wide-list page-col-one">
+                    <div class="blog-wide-list p-t-100 p-b-135">
+                        @foreach (var post in Model.PaginatedPosts)
+                        {
+                            <article class="box-blog-wide">
+                                <header class="bw-header m-b-30">
+                                    <h3 class="bw-title">
+                                        <a asp-action="Details" asp-controller="Posts" asp-route-slug="@post.Slug" asp-route-blogSlug="@Model!.Blog.Slug">@post.Title</a>
+                                    </h3>
+                                    <ul class="bw-cates h-list">
+                                        @if (@post.Tags is not null && @post.Tags.Distinct().Any())
+                                        {
+                                            foreach (var tag in post.Tags.Distinct())
+                                            {
+                                                <li>
+                                                    <a asp-action="Tag" asp-controller="Blogs" asp-route-tag="@tag.Text" asp-route-slug="@Model.Blog!.Slug" asp-route-page="1">@tag.Text</a>
+                                                </li>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <li>
+                                                <a href="#">No Catches...</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </header>
+                                <figure class="bw-image img-radius img-hv-zoomIn">
+                                    <a asp-action="Details" asp-controller="Posts" asp-route-slug="@post.Slug" asp-route-blogSlug="@Model!.Blog.Slug">
+                                        <img class="img-fluid" src="@ImageService.DecodeImage(@post.Image!, @post.ImageType!)" alt="@post.Title"/>
+                                    </a>
+                                </figure>
+                                <div class="bw-body m-b-30">
+                                    <p class="bw-text">
+                                        @post.Abstract
+                                    </p>
+                                    <a class="read-more" asp-action="Details" asp-controller="Posts" asp-route-slug="@post.Slug" asp-route-blogSlug="@Model!.Blog.Slug">READ MORE</a>
+                                </div>
+                                <div class="bw-footer">
+                                    <ul class="bw-infos h-list">
+                                        <li>
+                                            BY
+                                            <a asp-action="Details" asp-controller="Posts" asp-route-slug="@post.Slug" asp-route-blogSlug="@Model!.Blog.Slug">@post.Author!.FullName.ToUpper()</a>
+                                        </li>
+                                        <li>@post.Created.ToString("MMM dd, yyyy")</li>
+                                        <li>
+                                            <a href="#">@post.Comments!.Count.ToString() COMMENTS</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </article>
+                        }
+                        
+                        <!--Add paging controls here-->
+                        @if (Model!.PaginatedPosts.TotalItemCount > 3)
+                        {
+                            if (Model.CurrentAction == "DetailsByCategory")
+                            {
+                                @Html.PagedListPager(Model.PaginatedPosts, page => Url.Action(@Model.CurrentAction, "Blogs", new { slug = Model.Blog.Slug, page, categoryName = Model.CategoryName }),
+                                    new PagedListRenderOptions
+                                    {
+                                        UlElementClasses = new[] { "pagination", "pagination-left", "p-t-10" },
+                                        ActiveLiElementClass = "active"
+                                    })
+                            }
+                            else if (Model.CurrentAction == "Details")
+                            {
+                                @Html.PagedListPager(Model.PaginatedPosts, page => Url.Action(@Model.CurrentAction, "Blogs", new { slug = Model.Blog.Slug, page }),
+                                    new PagedListRenderOptions
+                                    {
+                                        UlElementClasses = new[] { "pagination", "pagination-left", "p-t-10" },
+                                        ActiveLiElementClass = "active"
+                                    })
+                            }
+                            else if (Model.CurrentAction == "PostSearch")
+                            {
+                                @Html.PagedListPager(Model.PaginatedPosts, page => Url.Action(@Model.CurrentAction, "Blogs", new { term = ViewBag.SearchTerm.ToString(), slug = Model.Blog.Slug, page }),
+                                    new PagedListRenderOptions
+                                    {
+                                        UlElementClasses = new[] { "pagination", "pagination-left", "p-t-10" },
+                                        ActiveLiElementClass = "active"
+                                    })
+                            }
+                            else if (Model.CurrentAction == "Tag")
+                            {
+                                @Html.PagedListPager(Model.PaginatedPosts, page => Url.Action(@Model.CurrentAction, "Blogs", new { tag = ViewBag.Tag.ToString(), slug = Model.Blog.Slug, page }),
+                                    new PagedListRenderOptions
+                                    {
+                                        UlElementClasses = new[] { "pagination", "pagination-left", "p-t-10" },
+                                        ActiveLiElementClass = "active"
+                                    })
+                            }
+                        }
+                        
+                        @if (Model.PaginatedPosts.Count == 0)
+                        {
+                            <h3>No Posts Found...</h3>
+                        }
+                    </div>
+                </section>
+            </div>
+            <div class="col-lg-3">
+                <aside class="page-col-two p-t-100">
+                    <div class="search-widget m-b-60">
+                        <form method="post" asp-action="PostSearch" asp-controller="Blogs" class="search-form">
+                            <div class="icon-search d-flex justify-content-center">
+                                <button class="icon_search" type="submit"></button>
+                            </div>
+                            <input type="hidden" name="slug" value="@Model.Blog.Slug"/>
+                            <input name="term" type="text" placeholder="Search..." required>
+                        </form>
+                    </div>
+                    <div class="list-widget cates-widget m-b-60">
+                        <h4 class="lw-title">CATEGORIES</h4>
+                        <ul class="lw-list v-list">
+                            @foreach (var category in Model.Blog.Categories!.OrderBy(c => c.Name))
+                            {
+                                if (category.Name == "All Posts")
+                                {
+                                    <li>
+                                        <a href="/Blog/@(Model.Blog.Slug)/Page/1">@category.Name</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <a href="/Blog/@(Model.Blog.Slug)/Category/@category.Name/Page/1">@category.Name</a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                    <div class="list-widget contact-widget m-b-60">
+                        <h4 class="lw-title">CONTACT ME</h4>
+                        <ul class="lw-list-three v-list">
+                            <li>
+                                <span class="icon fa fa-phone"></span>
+                                <span class="text">Phone: (+1) 860 671 1592</span>
+                            </li>
+                            <li>
+                                <span class="icon fa fa-envelope"></span>
+                                <span class="text">Email: michael.robinson@mikemrobinsondev.com</span>
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+@section CustomCss
+{
+    <link rel="stylesheet" href="~/css/Blogs/details.css"/>
+    <link rel="stylesheet" href="~/css/global/pagination.css"/>
+}
+
+@section Metadata
+{
+    <meta name="title" content="@(ViewData["Title"] as string)">
+    <meta name="description" content="@($"All posts for the blog '{Model?.Blog?.Name}' can be found here.")">
+    <meta name="keywords" content="Technology, Blog, ASP, .NET, Coding, C#, SQL, Bootstrap, HTML5, JavaScript, Michael, Robinson, Litchfield, Connecticut">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="30 days">
+    <meta name="author" content="Michael M. Robinson">
+}

@@ -1,0 +1,150 @@
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Project
+@inject IMWSImageService ImageService
+
+@{
+    ViewData["Title"] = $"Mike Robinson's Site - {Model.Title} ";
+
+    var nextProjectSlug = string.Empty;
+    if (ViewBag.NextProjectIndex is not null)
+    {
+        nextProjectSlug = (string)ViewBag.NextProjectIndex;
+    }
+
+    var lastProjectSlug = string.Empty;
+    if (ViewBag.LastProjectIndex is not null)
+    {
+        lastProjectSlug = (string)ViewBag.LastProjectIndex;
+    }
+}
+
+<!-- post projects-->
+<article class="post-project p-t-35 p-b-150">
+    <div class="container">
+        <div class="post-inner">
+            <header class="post-header mb-5">
+                <ul class="post-bre h-list">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="Index" asp-fragment="portfolio">Portfolio</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Projects" asp-action="Details" asp-route-slug="@Model.Slug">@Model.Title</a>
+                    </li>
+                </ul>
+                <h3 class="post-title">@Model.Title</h3>
+            </header>
+            <div class="post-body row no-gutters">
+                <div class="col col-figure">
+                    <figure class="post-image">
+                        <div class="js-slick slick-arrow-style-2" data-slick-lg="1" data-slick-dots="true" data-slick-arrows="true" data-slick-prevarrow="&lt;i class='arrow arrow-prev arrow_carrot-left'&gt;&lt;/i&gt;" data-slick-nextarrow="&lt;i class='arrow arrow-next arrow_carrot-right'&gt;&lt;/i&gt;"
+                             data-slick-dotsclass="dots-style-2">
+                            @if (Model.ProjectImages!.Any())
+                            {
+                                foreach (var projectImage in Model.ProjectImages!.OrderByDescending(pi => pi.Name))
+                                {
+                                    <div class="project-image-item">
+                                        <img class="img-fluid" src="@ImageService.DecodeImage(projectImage.File, projectImage.FileContentType)" alt="Featured Details">
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </figure>
+                </div>
+                <div class="col col-aside">
+                    <aside class="project-aside">
+                        <div class="project-aside-inner">
+                            <div class="project-aside-block m-b-30">
+                                <h4 class="project-aside-title m-b-15">PROJECT DESCRIPTION</h4>
+                                <p class="project-aside-paragraph">@Model.Description</p>
+                            </div>
+                            <div class="project-aside-block m-b-45">
+                                <h4 class="project-aside-title m-b-20">PROJECT DETAILS</h4>
+                                <ul class="project-aside-list">
+                                    <li>
+                                        <span class="t-left">Website:</span>
+                                        <a class="t-right" href="@Model.ProjectUrl" target="_blank">Visit Site</a>
+                                    </li>
+                                    <li>
+                                        <span class="t-left">Categories:</span>
+                                        <span class="t-right cate-link">
+                                            @foreach (var category in Model.ProjectCategories!)
+                                            {
+                                                var last = Model.ProjectCategories.Last();
+                                                if (category != last)
+                                                {
+                                                    <a href="#">@category.Text</a>
+                                                    <span>, &nbsp;</span>
+                                                }
+                                                else
+                                                {
+                                                    <a href="#">@category.Text &nbsp;</a>
+                                                }
+                                            }
+                                        </span>
+                                    </li>
+                                    <li>
+                                        <span class="t-left">Date:</span>
+                                        <span class="t-right">@Model.Created!.Value.ToString("MMMM dd, yyyy", CultureInfo.CreateSpecificCulture("en-US"))</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="project-aside-block">
+                                <h4 class="project-aside-title project-aside-title-sm m-b-20">SHARE</h4>
+                                <ul class="h-list social-list">
+                                    <li class="list-item" data-toggle="tooltip" title="Facebook">
+                                        <a class="fa fa-facebook" href="@($"https://www.facebook.com/sharer.php?u=https://{Context.Request.Host}{Url.Action("Details", "Projects", new { slug = Model.Slug })}")" target="_blank"></a>
+                                    </li>
+                                    <li class="list-item" data-toggle="tooltip" title="Twitter">
+                                        <a class="fa fa-twitter" href="@($"https://twitter.com/share?url=https://{Context.Request.Host}{Url.Action("Details", "Projects", new { slug = Model.Slug })}")" target="_blank"></a>
+                                    </li>
+                                    <li class="list-item" data-toggle="tooltip" title="Linkedin">
+                                        <a class="fa fa-linkedin" href="@($"https://www.linkedin.com/sharing/share-offsite/?url=https://{Context.Request.Host}{Url.Action("Details", "Projects", new { slug = Model.Slug })}")" target="_blank"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+            <footer class="post-footer">
+                <div class="post-toolbar align-items-center justify-content-between d-flex">
+                    @if (lastProjectSlug != string.Empty)
+                    {
+                        <a class="btn-prev" asp-action="Details" asp-controller="Projects" asp-route-slug="@lastProjectSlug">PREVIOUS</a>
+                    }
+                    <div class="loader-icon"></div>
+                    @if (nextProjectSlug != string.Empty)
+                    {
+                        <a class="btn-next" asp-action="Details" asp-controller="Projects" asp-route-slug="@nextProjectSlug">NEXT</a>
+                    }
+                </div>
+            </footer>
+        </div>
+    </div>
+</article>
+<!-- end post projects-->
+@{
+    var openGraphImage = $"https://{Context.Request.Host}/ArticleImages/ProjectImages/{Model.Slug}.png";
+}
+
+@section Metadata
+{
+    <!--Basic OpenGraph Tags-->
+    <meta property="og:title" content="@Model.Title"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:image" content="@openGraphImage"/>
+    <meta property="og:url" content="@Url.Action("Details", "Projects", new { slug = Model.Slug })"/>
+    <meta property='og:description' content="@Model.Description"/>
+
+    <!--Twitter OpenGraph Tags-->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:site" content="@@MichaelMRobins4"/>}
+
+@section CustomCss
+{
+    <link rel="stylesheet" href="~/css/Projects/details.css"/>
+}

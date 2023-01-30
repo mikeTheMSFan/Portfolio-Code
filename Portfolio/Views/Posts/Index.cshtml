@@ -1,0 +1,88 @@
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model PostIndexViewModel
+
+@inject IMWSImageService ImageService
+
+@{
+    ViewData["Title"] = "Mike Robinson's Site - Current Posts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- Begin Post Index -->
+<section id="currentPosts">
+    <div class="container">
+        <div>
+            <h1>Current Posts</h1>
+            @if (User.IsInRole("Administrator"))
+            {
+                <p>
+                    <a asp-action="Create">Create Post</a>
+                </p>
+            }
+
+        </div>
+        <hr/>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+            @foreach (var post in Model.Posts)
+            {
+                if (post.Image is not null && post.ImageType is not null)
+                {
+                    <div class="card mx-3" style="width: 18rem;">
+                        <div class="card-header">
+                            <img class="card-img-top" src="@Html.Raw(ImageService.DecodeImage(post.Image!, post.ImageType!))" alt="Card image cap">
+                        </div>
+                        <div class="card-body">
+                            <h4 id="blogName" class="card-title">@post.Title</h4>
+                            <hr class="mt-0 mb-2 border-top border-dark" />
+                            <p id="author" class="m-0">
+                                Author:
+                                <b>
+                                    <span class="authorName">@post.Author!.FullName</span>
+                                </b>
+                            </p>
+                            <p class="text-info mb-2">
+                                <i>@post.Abstract</i>
+                            </p>
+                            <a asp-action="Details" asp-route-slug="@post.Slug" asp-route-blogSlug="@post.Blog?.Slug" class="read-more">Read More<i class="las la-long-arrow-alt-right"></i></a>
+                            @if (User.IsInRole("Administrator"))
+                            {
+                                <hr class="mt-2 mb-2" />
+                                <div class="d-flex justify-content-end">
+                                    <a class="text-bold" asp-action="Edit" asp-controller="Posts" asp-route-id="@post.Id">Edit</a>
+                                    <span>|</span>
+                                    <a class="text-bold" asp-action="Delete" asp-controller="Posts" asp-route-id="@post.Id">Delete</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <!--Add paging controls here-->
+        @if (Model.Posts.PageNumber > 1)
+        {
+            <div class="row">
+                <div class="h5 mt-5">
+                    Page @(Model.Posts.PageCount < Model.Posts.PageNumber ? 0 : Model.Posts.PageNumber) of @Model
+                </div>
+            </div>
+            <div class="row">
+                <div class="text-center mb-3 ps-0">
+                    @Html.PagedListPager(Model.Posts, page => Url.Action("Index", new { page }),
+                        new PagedListRenderOptions
+                        {
+                            UlElementClasses = new[] { "pagination", "pagination-left", "p-t-10" },
+                            ActiveLiElementClass = "active"
+                        })
+                </div>
+            </div>
+        }
+    </div>
+</section><!--/. currentPosts-section -->
+
+@section CustomCss
+{
+    <link rel="stylesheet" href="~/css/global/pagination.css"/>
+}

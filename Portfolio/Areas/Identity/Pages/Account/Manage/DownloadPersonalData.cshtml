@@ -1,0 +1,22 @@
+﻿@page
+@model DownloadPersonalDataModel
+@{
+    ViewData["Title"] = "Mike Robinson's Site - Download Your Data";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+    Layout = "_Layout";
+}
+
+<section id="downloadPersonData">
+    <div class="container">
+        <h3>Download Your Data</h3>
+    </div>
+</section>
+
+@section CustomCss
+{
+    <link rel="stylesheet" href="~/css/FormStyle.css"/>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}

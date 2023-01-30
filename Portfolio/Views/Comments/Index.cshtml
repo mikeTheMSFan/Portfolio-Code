@@ -1,0 +1,71 @@
+@model IEnumerable<Comment>
+
+@{
+    ViewData["Title"] = "Mike Robinson's Site - Comments View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section id="commentsView">
+    <div class="container">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.GetEnumerator().Current.Body)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.GetEnumerator().Current.Created)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.GetEnumerator().Current.Author)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.GetEnumerator().Current.IsModerated)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.GetEnumerator().Current.IsSoftDeleted)
+                </th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Body)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Created)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Author!.FullName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsModerated)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsSoftDeleted)
+                    </td>
+                    <td>
+                        @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                            <span>|</span>
+                            if (item.IsSoftDeleted)
+                            {
+                                <a asp-action="SRestore" asp-route-id="@item.Id">Restore</a>
+                            }
+                            else
+                            {
+                                <a asp-action="SDelete" asp-route-id="@item.Id">Delete</a>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section><!--/. commentsView-section -->

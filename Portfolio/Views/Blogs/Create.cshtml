@@ -1,0 +1,115 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Collections.Immutable
+@using System.Security.Claims
+@using X.PagedList
+@inject UserManager<BlogUser> UserManager
+@model BlogCreateEditViewModel
+
+@{
+    //Page Title
+    ViewData["Title"] = "Mike Robinson's Site - Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    IEnumerable<SelectListItem> categoryItems = new List<SelectListItem>();
+
+    if ((Model.CategoryValues ?? new List<string>()).Any())
+    {
+        categoryItems = Model.CategoryValues?.Select(x => new SelectListItem() { Text = x, Value = x })!;
+    }
+}
+
+
+<section id="createBlog">
+    <div class="container">
+        <h1>Create Blog</h1>
+        <hr class="border-top border-2 border-info" />
+        <div class="row">
+            <div class="col-md-8">
+                <form asp-controller="Blogs" asp-action="Create" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group" hidden>
+                        <input asp-for="@Model!.Blog.AuthorId" value="@UserManager.GetUserId(User)"/>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="@Model!.Blog.Name" class="control-label"></label>
+                        <br />
+                        <span asp-validation-for="@Model!.Blog.Name" class="text-danger"></span>
+                        <input asp-for="@Model!.Blog.Name" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="@Model!.Blog.Description" class="control-label"></label>
+                        <textarea asp-for="@Model!.Blog.Description" class="form-control"></textarea>
+                        <span asp-validation-for="@Model!.Blog.Description" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <div id="image-box" class="image-container"></div>
+                        <div class="my-4">
+                            <div id="slider" class="ep-slider-bar w-100 h-auto"></div>
+                        </div>
+                        <button class="btn btn-outline-info" id="crop-btn" style="width: 100%; margin-top: 10px; display: none;" type="button">Crop</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label text-info">→ Image (svg, jpeg, gif, and png files.)</label>
+                        <br />
+                        <span asp-validation-for="@Model!.ImageFile" class="text-danger"></span>
+                        <input type="file" asp-for="@Model!.ImageFile" class="form-control"/>
+
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col">
+                                <span class="text-info">→ No category duplicates allowed.</span>
+                                <br />
+                                <label class="control-label">Manage Categories</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col">
+                                        <input type="text" class="form-control" id="CategoryEntry"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col w-100">
+                                        <button type="button" class="btn btn-primary btn-sm w-100" name="Add">Add</button>
+                                    </div>
+                                    <div class="col">
+                                        <button type="button" class="btn btn-primary btn-sm w-100" name="delete">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <select class="w-100" size="5" asp-for="CategoryValues" asp-items="@categoryItems"  id="CategoryList" multiple></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input id="confirm-btn" type="submit" value="Create" class="btn btn-primary"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div>
+            <a asp-controller="Home" asp-action="Index">Back Home</a>
+        </div>
+    </div>
+</section><!--/. createBlog-section -->
+
+@section CustomCss
+{
+    <link rel="stylesheet" href="~/lib/cropperjs/cropper.min.css"/>
+    <link rel="stylesheet" href="~/css/Auth/jquery-ui.min.css"/>
+    <link rel="stylesheet" href="~/css/Auth/jquery-ui.theme.min.css" />
+    <link rel="stylesheet" href="~/css/Blogs/forms.css"/>
+}
+
+@section Scripts
+{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/cropperjs/cropper.min.js"></script>
+    <script src="~/lib/jquery-ui-1.13.1/jquery-ui.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="~/js/customBlog.js"></script>
+    <script src="~/js/customCropper.js"></script>
+}

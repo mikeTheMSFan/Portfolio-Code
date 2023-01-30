@@ -1,0 +1,93 @@
+﻿@using Portfolio.Models.Content;
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model X.PagedList.IPagedList<Project>
+
+@{
+    ViewData["Title"] = "Mike Robinson's Site - Your Projects";
+}
+
+<section id="authorPosts">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12 mx-auto">
+                @if (User.IsInRole("Administrator"))
+                {
+                    <table>
+                        <tr>
+                            <a asp-controller="Projects" asp-action="Create">Create Project</a>
+                        </tr>
+                    </table>
+                }
+                <form asp-action="Search">
+                    <div class="search">
+                        <i class="la la-search"></i> <input name="term" type="text" class="w-100" placeholder="Search your projects here..."> <button>Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @if (Model.Any() == false)
+        {
+            <h3 class="my-3">No projects found...</h3>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.GetEnumerator().Current.Title)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.GetEnumerator().Current.Created)
+                    </th>
+                    <th class="d-none d-md-table-cell" scope="col">
+                        @Html.DisplayNameFor(model => model.GetEnumerator().Current.Slug)
+                    </th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var post in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => post.Title)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => post.Created)
+                        </td>
+                        <td class="d-none d-md-table-cell">
+                            @Html.DisplayFor(modelItem => post.Slug)
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@post.Id">Edit</a> |
+                            <a asp-action="Delete" asp-route-id="@post.Id">Delete</a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            <!--Add paging controls here-->
+            @if(Model.PageCount > 1)
+            {
+                <div class="row">
+                    <div class="col">
+                        @Html.PagedListPager(Model, page => Url.Action("AuthorIndex", new { page }),
+                            new PagedListRenderOptions
+                            {
+                                UlElementClasses = new[] { "pagination-wrap", "text-left" },
+                                ActiveLiElementClass = "active"
+                            })
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</section><!--/. authorPosts-section -->
+
+@section CustomCss
+{
+    <link rel="stylesheet" href="~/css/Posts/authorIndex.css">
+    <link rel="stylesheet" href="~/css/global/pagination.css"/>
+}

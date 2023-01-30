@@ -1,0 +1,80 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model LoginModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mike Robinson's Site - Log in</title>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/fontawesome-all.min.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/style.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/theme.css"/>
+</head>
+<body>
+<div class="form-body">
+    <div class="website-logo">
+        <a asp-controller="Home" asp-action="Index">
+            <div class="logo">
+                <img class="logo-size" src="~/imgs/Auth/logo.svg" alt=""/>
+            </div>
+        </a>
+    </div>
+    <div class="row">
+        <div class="img-holder">
+            <div class="bg"></div>
+            <div class="info-holder">
+                <img src="~/imgs/Auth/graphic2.svg" alt=""/>
+            </div>
+        </div>
+        <div class="form-holder">
+            <div class="form-content">
+                <div class="form-items">
+                    <h3>To access your settings, please sign in.</h3>
+                    <p>If you do not have an account please consider registering.</p>
+                    <div class="page-links">
+                        <a asp-area="Identity" asp-page="/Account/Login" class="active">Login</a><a asp-area="Identity" asp-page="/Account/Register">Register</a>
+                    </div>
+                    <form id="account" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" required type="email" placeholder="E-mail Address"/>
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" type="password"/>
+                        <input asp-for="Input.RememberMe" type="checkbox"/>
+                        <label asp-for="Input.RememberMe" class="form-label">
+                            @Html.DisplayNameFor(m => m.Input.RememberMe)
+                        </label>
+                        <br/>
+                        <br/>
+                        <recaptcha/>
+                        <div class="form-button">
+                            <button id="submit" type="submit" class="ibtn">Login</button> <a asp-area="Identity" asp-page="/Account/ForgotPassword">Forget password?</a>
+                        </div>
+                    </form>
+                    <form id="external-account" asp-page="/Account/ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        <div class="other-links">
+                            <span>Or login with</span>
+                            @foreach (var provider in Model.ExternalLogins!)
+                            {
+                                <input type="hidden" name="provider" value="@provider.Name"/>
+                                <div class="other-links">
+                                    <a href="javascript:document.getElementById('external-account').submit();">@provider.DisplayName</a>
+                                </div>
+                            }
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="~/js/Auth/jquery.min.js"></script>
+<partial name="_ValidationScriptsPartial" />
+<script src="~/js/Auth/popper.min.js"></script>
+<script src="~/js/Auth/bootstrap.min.js"></script>
+<script src="~/js/Auth/main.js"></script>

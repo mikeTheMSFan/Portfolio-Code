@@ -1,0 +1,95 @@
+﻿@page
+@model RegisterModel
+@{
+    var avatar = string.Empty;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mike Robinson's Site - Register</title>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/fontawesome-all.min.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/style.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/theme.css"/>
+    <link rel="stylesheet" href="~/lib/cropperjs/cropper.min.css"/>
+    <link rel="stylesheet" href="~/css/avatarCropper.css"/>
+    <link rel="stylesheet" href="~/css/Auth/jquery-ui.min.css"/>
+    <link rel="stylesheet" href="~/css/Auth/jquery-ui.theme.min.css"/>
+</head>
+<body>
+<div class="form-body">
+    <div class="website-logo">
+        <a asp-action="Index" asp-controller="Home">
+            <div class="logo">
+                <img class="logo-size" src="~/imgs/Auth/logo.svg" alt=""/>
+            </div>
+        </a>
+    </div>
+    <div class="row">
+        <div class="img-holder">
+            <div class="bg"></div>
+            <div class="info-holder">
+                <img src="~/imgs/Auth/graphic2.svg" alt=""/>
+            </div>
+        </div>
+        <div class="form-holder">
+            <div class="form-content">
+                <div class="form-items">
+                    <h3>Register @@ mikemrobinsondev.com</h3>
+                    <p>Registering allows you to post blog comments and customize your identity on the site.</p>
+                    <div class="page-links">
+                        <a asp-area="Identity" asp-page="/Account/Login">Login</a><a asp-area="Identity" asp-page="/Account/Register" class="active">Register</a>
+                    </div>
+                    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input asp-for="Input.FirstName" class="form-control" aria-required="true" placeholder="Your First name" required/>
+                        <input asp-for="Input.LastName" class="form-control" aria-required="true" placeholder="Your Last name" required/>
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="E-mail Address" required/>
+                        <label class="form-label">Upload Avatar (jpeg, gif, svg, png)</label>
+                        <input asp-for="Input.ImageFile" onchange="cropImgFunc(event)">
+                        <img class="d-block ms-0 currentAvatar" src="@Html.Raw(avatar)"/>
+                        <div class="cropper">
+                            <div class="result" id="inputImg"></div>
+                            <label class="mt-1 mb-0 d-block control-label">Avatar Preview</label>
+                            <img class="preImg my-3" id="preImg">
+                            <div id="slider" class="mb-3"></div>
+                        </div>
+                        <input asp-for="Input.Password" class="form-control" autocomplete="new-password" placeholder="Password..." aria-required="true" required/>
+                        <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="Confirm Password..." aria-required="true" required/>
+                        <input asp-for="Input.UserAcceptedTerms" type="checkbox"/>
+                        <label asp-for="Input.UserAcceptedTerms" class="form-label">I accept the terms of this site's <a class="text-light" asp-action="Privacy" asp-controller="Home" target="_blank">Privacy Policy</a></label>
+                        <div class="form-button">
+                            <button id="submit" type="submit" class="ibtn">Register</button>
+                        </div>
+                        <recaptcha/>
+                    </form>
+                    <form id="external-account" asp-page="/Account/ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        <div class="other-links">
+                            <span>Or login with</span>
+                            @foreach (var provider in Model.ExternalLogins!)
+                            {
+                                <input type="hidden" name="provider" value="@provider.Name"/>
+                                <div class="other-links">
+                                    <a href="javascript:document.getElementById('external-account').submit();">@provider.DisplayName</a>
+                                </div>
+                            }
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<partial name="_ValidationScriptsPartial"/>
+<script src="~/lib/jquery-ui-1.13.1/jquery-ui.min.js"></script>
+<script src="~/lib/cropperjs/cropper.min.js"></script>
+<script src="~/js/avatarCropper.js"></script>

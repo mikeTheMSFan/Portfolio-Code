@@ -1,0 +1,80 @@
+﻿@page
+@model LoginWithRecoveryCodeModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mike Robinson's Site - Recovery code verification</title>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/fontawesome-all.min.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/style.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/theme.css"/>
+</head>
+<body>
+<div class="form-body">
+    <div class="website-logo">
+        <a asp-controller="Home" asp-action="Index">
+            <div class="logo">
+                <img class="logo-size" src="~/imgs/Auth/logo.svg" alt=""/>
+            </div>
+        </a>
+    </div>
+    <div class="row">
+        <div class="img-holder">
+            <div class="bg"></div>
+            <div class="info-holder">
+                <img src="~/imgs/Auth/graphic2.svg" alt=""/>
+            </div>
+        </div>
+        <div class="form-holder">
+            <div class="form-content">
+                <div class="form-items">
+                    <h3>Recovery code verification</h3>
+                    <form id="recoveryCodeLogin" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input asp-for="Input.RecoveryCode" class="form-control" autocomplete="off"/>
+                        <label asp-for="Input.RecoveryCode" class="form-label"></label>
+                        <span asp-validation-for="Input.RecoveryCode" class="text-danger"></span>
+                        <div class="form-button">
+                            <button id="submit" type="submit" class="ibtn">Login</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="~/js/Auth/jquery.min.js"></script>
+<partial name="_ValidationScriptsPartial" />
+<script src="~/js/Auth/popper.min.js"></script>
+<script src="~/js/Auth/bootstrap.min.js"></script>
+<script src="~/js/Auth/main.js"></script>
+
+<!-- <section id="loginWithRecoveryCode">
+    <div class="container my-5">
+        <p>
+            You have requested to log in with a recovery code. This login will not be remembered until you provide
+            an authenticator app code at log in or disable 2FA and log in again.
+        </p>
+        <div class="row">
+            <div class="col-12 col-md-10 col-lg-7 col-xl-6 form-section">
+                <form method="post" class="form-form">
+                    <h2 class="mb-0">Recovery code verification</h2>
+                    <hr class="mt-0"/>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-floating">
+                        <input asp-for="Input.RecoveryCode" class="form-control" autocomplete="off"/>
+                        <label asp-for="Input.RecoveryCode" class="form-label"></label>
+                        <span asp-validation-for="Input.RecoveryCode" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="w-100 btn btn-lg default-btn">Log in</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section> -->

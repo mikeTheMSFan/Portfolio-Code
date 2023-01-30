@@ -1,0 +1,62 @@
+﻿@page
+@model ConfirmEmailChangeModel
+@{
+    string? status;
+    if (TempData["StatusMessage"] is not null)
+    {
+        status = TempData["StatusMessage"] as string;
+    }
+    else
+    {
+        status = string.Empty;
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title> Mike Robinson's Site - Mike Robinson's Site - Email Changes</title>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/fontawesome-all.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/style.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/theme.css" />
+</head>
+<body>
+    <div class="form-body">
+        <div class="website-logo">
+            <a asp-action="Index" asp-controller="Home">
+                <div class="logo">
+                    <img class="logo-size" src="~/imgs/Auth/logo.svg" alt="" />
+                </div>
+            </a>
+        </div>
+        <div class="row">
+            <div class="img-holder">
+                <div class="bg"></div>
+                <div class="info-holder">
+                    <img src="~/imgs/Auth/graphic2.svg" alt="" />
+                </div>
+            </div>
+            <div class="form-holder">
+                <div class="form-content">
+                    <div class="form-sent">
+                        <div class="tick-holder">
+                            <div class="tick-icon"></div>
+                        </div>
+                        <h3>Email Conformation</h3>
+                        <p>@status</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script src="~/js/Auth/jquery.min.js"></script>
+<partial name="_ValidationScriptsPartial" />
+<script src="~/js/Auth/popper.min.js"></script>
+<script src="~/js/Auth/bootstrap.min.js"></script>
+<script src="~/js/Auth/main.js"></script>

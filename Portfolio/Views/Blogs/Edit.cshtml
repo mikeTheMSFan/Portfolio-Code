@@ -1,0 +1,124 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+
+@inject IMWSImageService ImageService
+@model BlogCreateEditViewModel
+
+@{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    ViewData["Title"] = "Mike Robinson's Site - Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    IEnumerable<SelectListItem> categoryItems = new List<SelectListItem>();
+    if ((Model.CategoryValues ?? new List<string>()).Any())
+    {
+        categoryItems = Model.CategoryValues?.OrderBy(x => x).Select(x => new SelectListItem() { Text = x, Value = x })!;
+    }
+}
+
+@Html.Hidden("BlogId", Model.Blog.Id)
+
+<section id="editBlog">
+    <div class="container">
+        <!-- Begin Edit Blogs -->
+        <h1>Edit Blog</h1>
+        <hr class="border-top border-2 border-info" />
+        <div class="row">
+            <div class="col-md-8">
+                <form asp-action="Edit" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Blog.Id"/>
+                    <input type="hidden" asp-for="Blog.AuthorId"/>
+                    <div class="form-group">
+                        <label asp-for="Blog.Name" class="control-label"></label>
+                        <input asp-for="Blog.Name" class="form-control"/>
+                        <span asp-validation-for="Blog.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Blog.Description" class="control-label"></label>
+                        <textarea asp-for="Blog.Description" class="form-control"></textarea>
+                        <span asp-validation-for="Blog.Description" class="text-danger"></span>
+                    </div>
+                    @if (Model.Blog.Image == null)
+                    {
+                        <div class="form-group">
+                            <div id="image-box" class="image-container"></div>
+                            <div class="my-4">
+                                <div id="slider" class="ep-slider-bar w-100 h-auto"></div>
+                            </div>
+                            <button class="btn btn-outline-info" id="crop-btn" style="width: 100%; margin-top: 10px; display: none;" type="button">Crop</button>
+                        </div>
+                    }
+                    else if (Model.Blog.Image is not null && Model.Blog.ImageType is not null)
+                    {
+                        <div class="form-group">
+                            <div id="image-box" class="image-container">
+                                <img id="image" class="w-100" alt="blog picture" src="@Html.Raw(ImageService.DecodeImage(Model.Blog.Image, Model.Blog.ImageType))"/>
+                            </div>
+                            <div class="my-4">
+                                <div id="slider" class="ep-slider-bar w-100 h-auto"></div>
+                            </div>
+                            <button class="btn btn-outline-info" id="crop-btn" style="width: 100%; margin-top: 10px; display: none;" type="button">Crop</button>
+                        </div>
+                    }
+                    <div class="form-group">
+                        <label class="control-label text-info">→ Image (svg, jpeg, gif, and png files.)</label>
+                        <input type="file" asp-for="ImageFile" class="form-control"/>
+                        <span asp-validation-for="ImageFile" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col">
+                                <span class="text-info"> → 'All Posts' category cannot be deleted.</span>
+                                <br/>
+                                <span class="text-info"> → No category duplicates allowed.</span>
+                                <br/>
+                                <label class="control-label">Manage Categories</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col">
+                                        <input type="text" class="form-control" id="CategoryEntry"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col w-100">
+                                        <button type="button" class="btn btn-primary btn-sm w-100" name="Add">Add</button>
+                                    </div>
+                                    <div class="col">
+                                        <button type="button" class="btn btn-primary btn-sm w-100" name="delete">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <select class="w-100" size="5" asp-for="CategoryValues" asp-items="@categoryItems" id="CategoryList" multiple></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input id="confirm-btn" type="submit" value="Save" class="btn btn-primary"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section><!--/. editBlog-section -->
+
+@section CustomCss
+{
+    <link rel="stylesheet" href="~/lib/cropperjs/cropper.min.css"/>
+    <link rel="stylesheet" href="~/css/Auth/jquery-ui.min.css"/>
+    <link rel="stylesheet" href="~/css/Auth/jquery-ui.theme.min.css" />
+    <link rel="stylesheet" href="~/css/Blogs/forms.css"/>
+}
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/cropperjs/cropper.min.js"></script>
+    <script src="~/lib/jquery-ui-1.13.1/jquery-ui.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="~/js/customBlog.js"></script>
+    <script src="~/js/customCropper.js"></script>
+}

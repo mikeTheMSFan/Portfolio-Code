@@ -1,0 +1,345 @@
+@using Microsoft.AspNetCore.Identity
+@model PostIndexViewModel
+@inject IMWSImageService ImageService
+@inject IMWSPostService PostService
+@inject UserManager<BlogUser> UserManager
+
+@{
+    ViewData["Title"] = $"Mike Robinson's Portfolio - {Model.Post.Title}";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var currentUser = new BlogUser();
+    if (User.Identity!.IsAuthenticated)
+    {
+        currentUser = await UserManager.FindByIdAsync(UserManager.GetUserId(User)!);
+    }
+
+    var authorUser = await UserManager.FindByIdAsync(Model.Post!.AuthorId);
+    var commentBody = TempData["Comment"] as string;
+}
+
+@Html.Hidden("CommentBody", commentBody)
+@if (User.Identity!.IsAuthenticated)
+{
+    @Html.Hidden("UserStatus", "loggedIn")
+}
+else
+{
+    @Html.Hidden("UserStatus", "loggedOut")
+}
+
+<!-- Heading page-->
+<div id="blogHeading" class="blog-overlay heading-page heading-page-cover">
+    <img src="@ImageService.DecodeImage(Model.Post.Blog!.Image!, Model.Post.Blog!.ImageType!)" alt="blog banner"/>
+    <div>
+        <h3 class="hp-title">@Model.Post.Blog!.Name.ToUpper()</h3>
+       <breadcrumb></breadcrumb>
+    </div>
+</div>
+<!-- end heading page-->
+
+<main class="page-two-col bg-white">
+<div class="container">
+<div class="row">
+<div class="col-lg-9">
+    <div class="page-col-one p-t-35 p-b-60">
+        <article class="post-blog m-b-55">
+            <header class="post-header m-b-50">
+                <ul class="post-bre h-list">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Blogs" asp-action="AllBlogs" >Blogs</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Blogs" asp-action="Details" asp-route-slug="@Model.Post.Blog.Slug">@Model.Post.Blog.Name</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Post.Slug" asp-route-blogSlug="@Model.Post.Blog.Slug">@Model.Post.Title</a>
+                    </li>
+                </ul>
+                <h3 class="post-title">@Model.Post.Title</h3>
+            </header>
+            <figure class="post-image img-radius m-b-45">
+                <img class="img-fluid" src="@ImageService.DecodeImage(Model.Post.Image!, Model.Post.ImageType!)" alt="@Model.Post.Title">
+            </figure>
+            <div class="post-body">
+                <h3 class="post-title">@Model.Post.Title</h3>
+                <ul class="post-info h-list">
+                    <li class="post-info-item">
+                        by
+                        <a href="#0">@Model.Post.Author!.FullName</a>
+                    </li>
+                    <li class="post-info-item">@Model.Post.Created.ToString("MMMM dd, yyyy")</li>
+                    <li class="post-info-item">
+                        @if (@Model.Post.Tags is not null && @Model.Post.Tags.Distinct().Any())
+                        {
+                            foreach (var tag in Model.Post.Tags.Distinct())
+                            {
+                                <a asp-action="Tag" asp-controller="Blogs" asp-route-tag="@tag.Text" asp-route-slug="@Model.Post.Blog!.Slug" asp-route-page="1">@tag.Text</a>
+                            }
+                        }
+                        else
+                        {
+                            <a href="#0">No Catches...</a>
+                        }
+                    </li>
+                    <li class="post-info-item">
+                        <span>
+                            <a href="#0">@Model.Post.Comments!.Count Comments</a>
+                        </span>
+                    </li>
+                </ul>
+                @Html.Raw(Model.Post.Content)
+            </div>
+            <footer class="post-footer">
+                <div class="flex-bar d-md-flex align-items-start justify-content-lg-between m-b-40">
+                    <ul class="post-tags h-list">
+                        @if (@Model.Post.Tags is not null && @Model.Post.Tags.Distinct().Any())
+                        {
+                            foreach (var tag in Model.Post.Tags.Distinct())
+                            {
+                                <li>
+                                    <a class="post-tag-item" asp-action="Tag" asp-controller="Blogs" asp-route-tag="@tag.Text" asp-route-slug="@Model.Post.Blog!.Slug" asp-route-page="1">@tag.Text</a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li>
+                                <a href="#0" class="post-tag-item">No Catches...</a>
+                            </li>
+                        }
+                    </ul>
+                    <div class="post-socials">
+                        <span class="post-social-label">SHARE</span>
+                        <ul class="h-list social-list">
+                            <li class="list-item" data-toggle="tooltip" title="Facebook">
+                                <a class="fa fa-facebook" href="@($"https://www.facebook.com/sharer.php?u=https://{Context.Request.Host}{Url.Action("Details", "Posts", new { slug = Model.Post.Slug, blogSlug = Model.Post.Blog!.Slug })}")" target="_blank"></a>
+                            </li>
+                            <li class="list-item" data-toggle="tooltip" title="Twitter">
+                                <a class="fa fa-twitter" href="@($"https://twitter.com/share?url=https://{Context.Request.Host}{Url.Action("Details", "Posts", new { slug = Model.Post.Slug, blogSlug = Model.Post.Blog!.Slug })}")" target="_blank"></a>
+                            </li>
+                            <li class="list-item" data-toggle="tooltip" title="Linkedin">
+                                <a class="fa fa-linkedin" href="@($"https://www.linkedin.com/sharing/share-offsite/?url=https://{Context.Request.Host}{Url.Action("Details", "Posts", new { slug = Model.Post.Slug, blogSlug = Model.Post.Blog!.Slug })}")" target="_blank"></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="post-author">
+                    <div class="post-author-image">
+                        <a href="#0">
+                            <img src="@ImageService.DecodeImage(authorUser!.Image!, authorUser.ImageType!)" alt="@authorUser.FullName">
+                        </a>
+                    </div>
+                    <div class="post-author-text">
+                        <a href="#0" class="post-author-name">@authorUser.FullName</a>
+                        <p class="post-author-paragraph">@authorUser.AuthorDescription</p>
+                    </div>
+                </div>
+            </footer>
+        </article>
+        @if (Model.Post.Comments.Any())
+        {
+            <div class="comment-pane m-b-45">
+                <div class="comment-pane-header">
+                    <h3 class="comment-pane-title">@Model.Post.Comments.Count COMMENTS</h3>
+                </div>
+                <div class="comment-pane-body">
+                    <ul class="comment-pane-list">
+
+                        @foreach (var comment in Model.Post?.Comments.OrderByDescending(c => c.Created)!)
+                        {
+                            <li class="list-item">
+                                <div class="comment-item">
+                                    <div class="comment-author-avatar">
+                                        <a href="#0">
+                                            <img src="@ImageService.DecodeImage(authorUser.Image!, authorUser.ImageType!)" alt="Arthur Reyes">
+                                        </a>
+                                    </div>
+                                    <div class="comment-text">
+                                        <p class="comment-paragraph">
+                                            @if (comment.IsModerated && comment.ModeratorId is not null)
+                                            {
+                                                @Html.Raw($"This comment has been moderated by: <span class=\"text-info\">{(await UserManager.FindByIdAsync(comment.ModeratorId))?.FullName}</span> <br /> Reason: <span class=\"text-danger\">{comment.ModerationType.ToString()}</span>.")
+                                            }
+                                            else
+                                            {
+                                                @Html.Raw(comment.Body)
+                                            }
+                                        </p>
+                                        <div class="comment-info">
+                                            <a href="#0">@comment.Author?.FullName &nbsp;</a>
+                                            <span>- @comment.Created.ToString("MMMM dd, yyyy") &nbsp;</span>
+                                            @if (User.IsInRole("Moderator") || User.IsInRole("Administrator"))
+                                            {
+                                                <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id">
+                                                    <span class="text-danger">Moderate</span>
+                                                </a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+        <div class="leave-comment-pane">
+            <div class="leave-comment-pane-body">
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <form id="commentform" method="post" class="leave-comment-pane-form" asp-controller="Posts" asp-action="AddPostComment">
+                        <div class="form-group">
+                            <div class="col-sm-12 sm-padding">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group" hidden>
+                            <input name="RedirectPostSlug" value="@Model.Post.Slug!.ToLower()"/>
+                            <input name="RedirectBlogSlug" value="@Model.Post.Blog?.Slug!.ToLower()"/>
+                            <input asp-for="@(new Comment().PostId)" value="@Model.Post.Id"/>
+                            <input asp-for="@(new Comment().AuthorId)" value="@currentUser?.Id"/>
+                        </div>
+                        <div class="form-group input-item">
+                            <span asp-validation-for="@(new Comment().Body)" class="text-danger"></span>
+                            <textarea id="Comment_Body" class="au-input au-input-border au-input-radius" asp-for="@(new Comment().Body)" placeholder="COMMENT..." required></textarea>
+                        </div>
+                        <div class="row no-gutters form-row">
+                            <div class="col-lg-4 input-item form-group">
+                                <input class="au-input au-input-border au-input-radius" disabled type="text" placeholder="@currentUser!.FullName.ToUpper()">
+                            </div>
+                            <div class="col-lg-4 input-item form-group">
+                                <input class="au-input au-input-border au-input-radius" disabled type="text" placeholder="@currentUser.Email?.ToUpper()">
+                            </div>
+                        </div>
+                        <div class="input-submit">
+                            <input class="au-btn au-btn-primary au-btn-pill au-btn-shadow" type="submit" value="POST COMMENT">
+                        </div>
+                        <div class="pt-3">
+                            <recaptcha/>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <div class="leave-comment-pane-header">
+                        <h3 class="leave-comment-pane-title">LEAVE A COMMENT</h3>
+                        <p class="leave-comment-pane-notify">You must be logged in to post a comment.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-lg-3">
+    <aside class="page-col-two p-t-160">
+        <div class="search-widget m-b-60">
+            <form method="post" asp-action="PostSearch" asp-controller="Blogs" class="search-form">
+                <div class="icon-search d-flex justify-content-center">
+                    <button class="icon_search" type="submit"></button>
+                </div>
+                <input type="hidden" name="slug" value="@Model.Post.Blog!.Slug"/>
+                <input name="term" type="text" placeholder="Search..." required>
+            </form>
+        </div>
+        <div class="list-widget cates-widget m-b-60">
+            <h4 class="lw-title">CATEGORIES</h4>
+            <ul class="lw-list v-list">
+                @foreach (var category in Model.Post.Blog.Categories!.OrderBy(c => c.Name))
+                {
+                    if (category.Name == "All Posts")
+                    {
+                        <li>
+                            <a href="/Blog/@(Model.Post.Blog.Slug)/Page/1">@category.Name</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a href="/Blog/@(Model.Post.Blog.Slug)/Category/@category.Name/Page/1">@category.Name</a>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+        <div class="list-widget blog-popular-widget m-b-60">
+            <h4 class="lw-title">LATEST ARTICLES</h4>
+            <ul class="blog-sm-list v-list">
+                @if (Model.RecentArticles.Any())
+                {
+                    foreach (var post in Model.RecentArticles)
+                    {
+                        <li class="box-blog-sm">
+                            <a class="box-image" asp-action="Details" asp-controller="Posts" asp-route-slug="@post.Slug" asp-route-blogSlug="@post.Blog!.Slug">
+                                <img src="@ImageService.DecodeImage(post.ThumbNail!, post.ImageType!)" alt="Popular blog">
+                            </a>
+                            <div class="box-content">
+                                <h3 class="box-title">
+                                    <a asp-action="Details" asp-controller="Posts" asp-route-slug="@post.Slug" asp-route-blogSlug="@post.Blog!.Slug">@post.Title</a>
+                                </h3>
+                                @{
+                                    //the day the post was created
+                                    var creationDate = post.Created;
+                                    //days past since the post was created
+                                    var daysPast = System.Math.Round((DateTime.Now - creationDate).TotalDays, 0, MidpointRounding.ToEven);
+                                }
+                                <span class="blog-post-time">@daysPast days ago</span>
+                            </div>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+        <div class="list-widget contact-widget m-b-60">
+            <h4 class="lw-title">CONTACT ME</h4>
+            <ul class="lw-list-three v-list">
+                <li>
+                    <span class="icon fa fa-phone"></span>
+                    <span class="text">Phone: (+1) 860 671 1592</span>
+                </li>
+                <li>
+                    <span class="icon fa fa-envelope"></span>
+                    <span class="text">Email: michael.robinson@mikemrobinsondev.com</span>
+                </li>
+            </ul>
+        </div>
+    </aside>
+</div>
+</div>
+</div>
+</main>
+
+@{
+    var openGraphImage = $"https://{Context.Request.Host}/ArticleImages/PostImages/{Model.Post.Slug}.png";
+}
+
+@section CustomCss
+{
+    <link rel="stylesheet" href="~/css/Posts/details.css"/>
+}
+
+@section Metadata
+{
+    <!--Basic OpenGraph Tags-->
+    <meta property="og:title" content="@Model.Post.Title"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:image" content="@openGraphImage"/>
+    <meta property="og:url" content="@(Url.Action("Details", "Posts", new { slug = Model.Post.Slug, blogSlug = Model.Post.Blog!.Slug }))"/>
+    <meta property='og:description' content="@Model.Post.Abstract"/>
+
+    <!--Twitter OpenGraph Tags-->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:site" content="@@MichaelMRobins4"/>
+
+    <meta name="title" content="@(ViewData["Title"] as string)"/>
+    <meta name="description" content="@Model.Post.Abstract">
+    <meta name="keywords" content="Technology, Blog, ASP, .NET, Coding, C#, SQL, Bootstrap, HTML5, JavaScript, Michael, Robinson, Litchfield, Connecticut">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="language" content="English">
+    <meta name="author" content="Michael M. Robinson">
+}

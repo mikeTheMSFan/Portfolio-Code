@@ -1,0 +1,68 @@
+﻿@page
+@using System.Text
+@using System.Text.Json
+@using static Portfolio.Areas.Identity.Pages.Account.ExternalLoginModel;
+@model ExternalLoginModel
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mike Robinson's Site - Register External Login</title>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/fontawesome-all.min.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/style.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/theme.css"/>
+    <link rel="stylesheet" type="text/css" href="~/css/Auth/CustomAuth.css"/>
+</head>
+<body>
+<div class="form-body">
+    <div class="website-logo">
+        <a asp-controller="Home" asp-action="Index">
+            <div class="logo">
+                <img class="logo-size" src="~/imgs/Auth/logo.svg" alt=""/>
+            </div>
+        </a>
+    </div>
+    <div class="row">
+        <div class="img-holder">
+            <div class="bg"></div>
+            <div class="info-holder">
+                <img src="~/imgs/Auth/graphic2.svg" alt=""/>
+            </div>
+        </div>
+        <div class="form-holder">
+            <div class="form-content">
+                <div class="form-items">
+                    <h3>Associate your @Model.ProviderDisplayName account</h3>
+                    <p>
+                        You've successfully authenticated with <strong>@Model.ProviderDisplayName</strong>.
+                        Please enter an email address and click the Register button to finish
+                        logging in.
+                    </p>
+                    <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="fs-1 text-warning"></div>
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" required type="email" placeholder="E-mail Address"/>
+                        <input type="hidden" asp-for="Claims.FirstName" class="form-control" autocomplete="FirstName"/>
+                        <input type="hidden" asp-for="Claims.LastName" class="form-control" autocomplete="LastName"/>
+                        <input type="hidden" asp-for="Claims.Base64ProfilePicture" class="form-control"/>
+                        <input type="checkbox" asp-for="Claims.UserAcceptedTerms"/>
+                        <label asp-for="Claims.UserAcceptedTerms">I accept the terms of this site's <a class="text-light" asp-action="Privacy" asp-controller="Home" target="_blank">Privacy Policy</a></label>
+                        <br/>
+                        <div class="form-button">
+                            <button id="submit" type="submit" class="ibtn">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="~/js/Auth/jquery.min.js"></script>
+<partial name="_ValidationScriptsPartial"/>
+<script src="~/js/Auth/popper.min.js"></script>
+<script src="~/js/Auth/bootstrap.min.js"></script>
+<script src="~/js/Auth/main.js"></script>

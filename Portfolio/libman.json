@@ -1,0 +1,19 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "cropperjs@1.5.12",
+      "destination": "wwwroot/lib/cropperjs/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "sweetalert2@11.6.15",
+      "destination": "wwwroot/lib/sweetalert2/"
+    },
+    {
+      "library": "dropzone@5.9.3",
+      "destination": "wwwroot/lib/dropzone/"
+    }
+  ]
+}

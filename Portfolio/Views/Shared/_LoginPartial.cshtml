@@ -1,0 +1,80 @@
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<BlogUser> SignInManager
+@inject UserManager<BlogUser> UserManager
+@inject IMWSImageService ImageService
+@{
+    var user = await UserManager.FindByIdAsync(UserManager.GetUserId(User)!);
+    var avatar = string.Empty;
+    var imageTag = string.Empty;
+    if (User.Identity!.IsAuthenticated)
+    {
+        if (user!.Image is not null && user.ImageType is not null)
+        {
+            avatar = ImageService.DecodeImage(user.Image, user.ImageType);
+        }
+        imageTag = avatar == string.Empty ? imageTag : $"<img class=\"rounded-circle\" style=\"height:40px;\" id=\"profileImage\" src=\"{Html.Raw(avatar)}\" alt=\"profile image\"/>&nbsp;&nbsp;&nbsp;";
+    }
+}
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item has-drop">
+        <a class="nav-link" href="#"><span>@Html.Raw(imageTag) @user!.FirstName.ToUpper()</span></a>
+
+        <ul class="drop-menu left">
+            <li class="drop-item">
+                <a class="drop-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Manage Account</a>
+            </li>
+            <li class="drop-item logoutLink">
+                <a class="drop-link" href="javascript:void(0);" onclick="document.querySelector('.logoutForm').submit()" onKeyDown="keyhandler_for_space()">Logout</a>
+            </li>
+            @if (User.IsInRole("Administrator"))
+            {
+                <li class="drop-item">
+                    <hr/>
+                </li>
+                <li class="drop-item">
+                    <a class="drop-link" asp-controller="Posts" asp-action="AllAuthorPosts">View Your Posts</a>
+                </li>
+                <li class="drop-item">
+                    <a class="drop-link" asp-controller="Blogs" asp-action="GetAuthorBlogs">View Your Blogs</a>
+                </li>
+                <li class="drop-item">
+                    <a class="drop-link" asp-controller="Projects" asp-action="AllAuthorProjects">View Your Projects</a>
+                </li>
+            }
+
+            @if (User.IsInRole("Moderator") || User.IsInRole("Administrator"))
+            {
+                <li class="drop-item">
+                    <hr/>
+                </li>
+                <li class="drop-item">
+                    <a class="drop-link" asp-controller="Comments" asp-action="ApprovedComments">Approved Comments</a>
+                </li>
+                <li class="drop-item">
+                    <a class="drop-link" asp-controller="Comments" asp-action="ModeratedIndex">Moderated Comments</a>
+                </li>
+                <li class="drop-item">
+                    <a class="drop-link" asp-controller="Comments" asp-action="SoftDeletedComments">Soft-deleted Comments</a>
+                </li>
+            }
+        </ul>
+    </li>
+    <li hidden>
+        <form asp-area="Identity" class="logoutForm" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"></form>
+    </li>
+}
+else
+{
+    <li class="nav-item has-drop">
+        <a class="nav-link" href="">ACCOUNT</a>
+        <ul class="drop-menu left">
+            <li class="drop-item">
+                <a class="drop-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            </li>
+            <li class="drop-item">
+                <a class="drop-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+            </li>
+        </ul>
+    </li>
+}

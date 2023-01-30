@@ -1,0 +1,103 @@
+@using Microsoft.Extensions.FileProviders
+
+@{
+    Layout = string.Empty;
+}
+<html lang="en-us" class="no-js">
+<head>
+    <meta charset="utf-8"/>
+    <title>OOPS - 404 Not found</title>
+    <meta name="description" content="Page not found on Mike's Website."/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="author" content="Michael M. Robinson"/>
+    <link rel="stylesheet" type="text/css" href="~/css/NotFound/style.css"/>
+</head>
+<body>
+
+<!-- Your logo on the top left -->
+<a asp-action="Index" asp-controller="Home" class="logo-link" title="back home">
+    <img src="~/imgs/NotFound/logo.png" class="logo" alt="Mike Robinson Developer"/>
+</a>
+
+<div class="content">
+    <div class="content-box">
+        <div class="big-content">
+            <!-- Main squares for the content logo in the background -->
+            <div class="list-square">
+                <span class="square"></span>
+                <span class="square"></span>
+                <span class="square"></span>
+            </div>
+
+            <!-- Main lines for the content logo in the background -->
+            <div class="list-line">
+                <span class="line"></span>
+                <span class="line"></span>
+                <span class="line"></span>
+                <span class="line"></span>
+                <span class="line"></span>
+                <span class="line"></span>
+            </div>
+
+            <!-- The animated searching tool -->
+            <i class="fa fa-search" aria-hidden="true"></i>
+
+            <!-- div clearing the float -->
+            <div class="clear"></div>
+        </div>
+
+        <!-- Your text -->
+        <h1>Oops! Error 404 not found.</h1>
+        <p>
+            The page you were looking for doesn't exist.<br/>
+            If you feel this is an error, <a href="mailto:michael.robinson@mikemrobinsondev.com">Contact the web master</a>.
+        </p>
+    </div>
+</div>
+
+<footer class="light">
+    <ul>
+        <li>
+            <a asp-action="Index" asp-controller="Home">HOME</a>
+        </li>
+
+        <li>
+            <a asp-action="Index" asp-controller="Home" asp-fragment="about-me">ABOUT ME</a>
+        </li>
+
+        <li>
+            <a asp-action="Index" asp-controller="Home" asp-fragment="portfolio">PORTFOLIO</a>
+        </li>
+
+        <li>
+            <a asp-action="Index" asp-controller="Blogs">BLOGS</a>
+        </li>
+
+        <li>
+            <a asp-action="Index" asp-controller="Home" asp-fragment="contact-me">CONTACT ME</a>
+        </li>
+
+        <li>
+            <a href="https://www.facebook.com/michaelMRobinson860" target="_blank">
+                <i class="fa fa-facebook"></i>
+            </a>
+        </li>
+
+        <li>
+            <a href="https://twitter.com/MichaelMRobins4" target="_blank">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/mikeTheMSFan" target="_blank">
+                <i class="fa fa-github"></i>
+            </a>
+        </li>
+    </ul>
+</footer>
+
+<script src="~/js/NotFound/jquery.min.js"></script>
+<script src="~/js/NotFound/bootstrap.min.js"></script>
+<script src="~/js/NotFound/vegas.js"></script>
+</body>
+</html>
