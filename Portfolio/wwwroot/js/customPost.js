@@ -6,7 +6,20 @@
   const categorySelectList = document.getElementById('Post_CategoryId');
   const categoryId = document.getElementById('CategoryId');
   const blogSelectList = document.getElementById('Post_BlogId');
+  const form = document.getElementById('postForm');
+  const articleData = document.getElementById('ArticleData').value;
+  const host = location.protocol.concat('//').concat(window.location.host);
+
+  let articleDataJson = null;
+  if (articleData) {
+    articleDataJson = JSON.parse(articleData);
+  }
+
   let index = 0;
+
+  jQuery.validator.setDefaults({
+    ignore: ":hidden, [contenteditable='true']:not([name])",
+  });
 
   fetchCategories();
   blogSelectList.addEventListener('change', () => {
@@ -139,5 +152,49 @@
     imageUrl: '/imgs/error.png',
     timer: 5000,
     buttonsStyling: false,
+  });
+
+  const editor = new EditorJS({
+    holder: 'editorJs',
+    tools: {
+      image: {
+        class: ImageTool,
+        config: {
+          endpoints: {
+            byFile: `${host}/Posts/UploadPostImageFile`,
+          },
+          field: 'file',
+        },
+      },
+      paragraph: {
+        class: Paragraph,
+        inlineToolbar: true,
+      },
+      list: {
+        class: List,
+        inlineToolbar: true,
+        config: {
+          defaultStyle: 'unordered',
+        },
+      },
+      header: Header,
+      quote: Quote,
+      code: CodeTool,
+    },
+    minHeight: 0,
+    data: articleDataJson,
+  });
+
+  form.addEventListener('submit', (e) => {
+    editor
+      .save()
+      .then((outputData) => {
+        const postContent = document.getElementById('Post_Content');
+        postContent.value = outputData.blocks.length === 0 ? '' : JSON.stringify(outputData);
+      })
+      .catch((error) => {
+        alert('An error occured, please let the administrator know.');
+        false;
+      });
   });
 });

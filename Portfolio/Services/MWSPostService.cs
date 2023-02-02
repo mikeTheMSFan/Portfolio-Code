@@ -27,26 +27,6 @@ public class MWSPostService : IMWSPostService
         _imageService = imageService;
     }
 
-    #region Add Post
-
-    public async Task AddPostAsync(Post post)
-    {
-        try
-        {
-            await _context.AddAsync(post);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("****************Error adding post to the database****************");
-            Console.WriteLine(ex.Message);
-            Console.WriteLine("*****************************************************************");
-            throw;
-        }
-    }
-
-    #endregion
-
     #region Delete Post
 
     public async Task DeletePostAsync(Post post)
@@ -247,6 +227,26 @@ public class MWSPostService : IMWSPostService
         catch (Exception ex)
         {
             Console.WriteLine("**************Error removing post from the database**************");
+            Console.WriteLine(ex.Message);
+            Console.WriteLine("*****************************************************************");
+            throw;
+        }
+    }
+
+    #endregion
+
+    #region Add Post
+
+    public async Task AddPostAsync(Post post)
+    {
+        try
+        {
+            await _context.AddAsync(post);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("****************Error adding post to the database****************");
             Console.WriteLine(ex.Message);
             Console.WriteLine("*****************************************************************");
             throw;

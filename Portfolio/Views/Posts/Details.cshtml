@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Identity
+@using System.Text
 @model PostIndexViewModel
 @inject IMWSImageService ImageService
 @inject IMWSPostService PostService
@@ -14,11 +15,13 @@
         currentUser = await UserManager.FindByIdAsync(UserManager.GetUserId(User)!);
     }
 
+    var currentPostJson = Encoding.Unicode.GetString(Model.Post.PostBytes!);
     var authorUser = await UserManager.FindByIdAsync(Model.Post!.AuthorId);
     var commentBody = TempData["Comment"] as string;
 }
 
 @Html.Hidden("CommentBody", commentBody)
+@Html.Hidden("CurrentPostJson", currentPostJson)
 @if (User.Identity!.IsAuthenticated)
 {
     @Html.Hidden("UserStatus", "loggedIn")
@@ -29,11 +32,12 @@ else
 }
 
 <!-- Heading page-->
-<div id="blogHeading" class="blog-overlay heading-page heading-page-cover">
-    <img src="@ImageService.DecodeImage(Model.Post.Blog!.Image!, Model.Post.Blog!.ImageType!)" alt="blog banner"/>
+<div id="blogHeading" class="heading-page blog-overlay heading-page-cover p-t-150 p-b-150" style="background: url(@ImageService.DecodeImage(Model.Post.Blog?.Image!, Model.Post.Blog?.ImageType!)) center center/cover no-repeat;">
     <div>
-        <h3 class="hp-title">@Model.Post.Blog!.Name.ToUpper()</h3>
-       <breadcrumb></breadcrumb>
+        <h3 class="hp-title mb-5 mb-md-0">@Model.Post.Blog?.Name.ToUpper()</h3>
+        <div id="breadCrumbContainer" class="mt-3 mt-md-0">
+            <breadcrumb></breadcrumb>
+        </div>
     </div>
 </div>
 <!-- end heading page-->
@@ -50,13 +54,13 @@ else
                         <a href="/">Home</a>
                     </li>
                     <li>
-                        <a asp-controller="Blogs" asp-action="AllBlogs" >Blogs</a>
+                        <a asp-controller="Blogs" asp-action="AllBlogs">Blogs</a>
                     </li>
                     <li>
-                        <a asp-controller="Blogs" asp-action="Details" asp-route-slug="@Model.Post.Blog.Slug">@Model.Post.Blog.Name</a>
+                        <a asp-controller="Blogs" asp-action="Details" asp-route-slug="@Model.Post.Blog?.Slug">@Model.Post.Blog?.Name</a>
                     </li>
                     <li>
-                        <a asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Post.Slug" asp-route-blogSlug="@Model.Post.Blog.Slug">@Model.Post.Title</a>
+                        <a asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Post.Slug" asp-route-blogSlug="@Model.Post.Blog?.Slug">@Model.Post.Title</a>
                     </li>
                 </ul>
                 <h3 class="post-title">@Model.Post.Title</h3>
@@ -91,7 +95,7 @@ else
                         </span>
                     </li>
                 </ul>
-                @Html.Raw(Model.Post.Content)
+                <div id="editorJs"></div>
             </div>
             <footer class="post-footer">
                 <div class="flex-bar d-md-flex align-items-start justify-content-lg-between m-b-40">
@@ -303,7 +307,7 @@ else
                 </li>
                 <li>
                     <span class="icon fa fa-envelope"></span>
-                    <span class="text">Email: michael.robinson@mikemrobinsondev.com</span>
+                    <a id="mail-link" class="text" href="mailto:michael.robinson@mikemrobinsondev.com?subject=I%20would%20like%20to%20talk%20to%20you%20about%20a%20business%20opportunity">Email Me</a>
                 </li>
             </ul>
         </div>
@@ -319,7 +323,8 @@ else
 
 @section CustomCss
 {
-    <link rel="stylesheet" href="~/css/Posts/details.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@@latest/dist/summernote-lite.min.css" integrity="sha256-IKhQVXDfwbVELwiR0ke6dX+pJt0RSmWky3WB2pNx9Hg=" crossorigin="anonymous">
+    <link rel="stylesheet" href="~/css/Posts/details.min.css"/>
 }
 
 @section Metadata
@@ -342,4 +347,19 @@ else
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="language" content="English">
     <meta name="author" content="Michael M. Robinson">
+}
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/@@editorjs/editorjs@@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@editorjs/image@@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@editorjs/header@@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@editorjs/quote@@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@editorjs/code@@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@editorjs/paragraph@@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@editorjs/list@@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@@latest/dist/summernote.min.js" integrity="sha256-rEjDsbbc7HG3Yqb0mMN023/sN4tKGFMnZgpvYxcoT/c=" crossorigin="anonymous"></script>
+
+    <script src="~/js/Posts/postDisplay.js"></script>
+    <script src="~/js/summerNoteComment.js"></script>
 }
